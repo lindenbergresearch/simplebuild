@@ -1,0 +1,50 @@
+#
+# SIMPLE BUILD FOR RACK
+#
+# Target definitions for build process 
+#
+# Copyright 2017 Lindenberg Research Tec.
+# All rights MIT licenced.
+#
+# DATE      : 11/07/2017
+# AUTHOR    : patrick@heapdump.com
+#
+
+
+#
+# global variables
+#
+DEFAULT_TARGET="plugin"
+MAKE_CMD="make"
+RACK_DIR="../.."
+
+#
+# build target for `plugin'
+#
+function target_plugin() {
+	$MAKE_CMD clean
+	$MAKE_CMD
+}
+
+#
+# build target for `all'
+#
+function target_all() {
+	pushd $RACK_DIR
+		$MAKE_CMD clean
+		$MAKE_CMD
+	popd
+
+	__plugin
+}
+
+
+#
+# build target for `run'
+#
+function target_run() {
+	__plugin
+
+	push $RACK_DIR
+	make run
+}
