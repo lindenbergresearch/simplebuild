@@ -23,14 +23,16 @@ VENDOR="http://github.com/lindenbergresearch"
 TARGETS_CONFIG="./targets.build"
 TARGET_PREFIX="target_"
 
+
 #
 # check if given target exists
 #
 target_exists() {
   # use prefixed underscores to define a target as bash function
-  local TARGETF=${TARGET_PREFIX}{$1}
-  [ `type -t $TARGETF`"" == 'function' ]
+  local TARGETF=${TARGET_PREFIX}${1}
+  [ `type -t ${TARGETF}`"" == 'function' ]
 }
+
 
 #
 # print usage text
@@ -53,9 +55,10 @@ function abort() {
 
 	printf "\n\a[BUILD ABORTED: $1]\n\n"
 	
-	# if exitcode passed => exit
-	[[ $EC != "" ]] && exit $EC
+	# if exit code passed => exit
+	[[ ${EC} != "" ]] && exit ${EC}
 }
+
 
 #
 # run target and check for error
@@ -63,40 +66,40 @@ function abort() {
 function run() {
 	local TARGET=$1
 	# add prefix to target name to get function binding
-	local FNAME=$TARGET_PREFIX$TARGET
+	local FNAME=${TARGET_PREFIX}${TARGET}
 
 	# check if target name given and valid
-	[[ $TARGET == "" ]] && abort "run can not execute an empty target" 6
+	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
 	printf "[$TARGET]\n"
 
-	$FNAME | sed "s/^/    /"
+	${FNAME} | sed "s/^/    /"
 	local RESULT=$?
 
 	# check success of executed target
-	[[ $RESULT != 0 ]] && abort "Target: '$TARGET' aborted with exit-code: $RESULT"
+	[[ ${RESULT} != 0 ]] && abort "Target: '$TARGET' aborted with exit-code: $RESULT"
 }
 
 
 #
-# init build proccess 
+# init build process
 #
 function init() {
 
 	# check if target definition exists
-	[[ -f $TARGETS_CONFIG ]] || abord "Target definition file not found: '$TARGETS_CONFIG'"
+	[[ -f ${TARGETS_CONFIG} ]] || abord "Target definition file not found: '$TARGETS_CONFIG'"
 
 	# load target definitions into current shell
-	. $TARGETS_CONFIG
+	. ${TARGETS_CONFIG}
 
 	# check for default target
-	target_exists $DEFAULT_TARGET || abort "Default target does not exist: '$DEFAULT_TARGET'" 3
+	target_exists ${DEFAULT_TARGET} || abort "Default target does not exist: '${DEFAULT_TARGET}'" 3
 	
 	# check for Rack dir
-	[[ -d $RACK_DIR ]] || abort "Rack base directory does not exist: '$RACK_DIR'" 4
+	[[ -d ${RACK_DIR} ]] || abort "Rack base directory does not exist: '$RACK_DIR'" 4
 
 	# check for make command
-	[ `type -t $MAKE_CMD`"" == 'file' ] || abort "Make command not found: '$MAKE_CMD'" 5
+	[ `type -t ${MAKE_CMD}`"" == 'file' ] || abort "Make command not found: '${MAKE_CMD}'" 5
 }
 
 #
@@ -104,17 +107,17 @@ function init() {
 #
 function build() {
 	# empty parameter => run default target
-	[[ $PARAM == "" ]] && run $DEFAULT_TARGET ; return 
+	[[ ${PARAM} == "" ]] && run ${DEFAULT_TARGET} ; return
 
 
 }
 
-# print programm info
+# print app info
 printf "\n$TITLE $VERSION\n"
 printf "$VENDOR\n"
 printf "All rights MIT licensed.\n\n"
 
-# capture current time for measurement 
+# capture current time for build measurement
 START_TIME=$(date +%s)
 
 init
