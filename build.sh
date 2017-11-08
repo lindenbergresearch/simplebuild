@@ -87,7 +87,7 @@ function run() {
 function init() {
 
 	# check if target definition exists
-	[[ -f ${TARGETS_CONFIG} ]] || abord "Target definition file not found: '$TARGETS_CONFIG'"
+	[[ -f ${TARGETS_CONFIG} ]] || abort "Target definition file not found: '$TARGETS_CONFIG'"
 
 	# load target definitions into current shell
 	. ${TARGETS_CONFIG}
