@@ -59,8 +59,10 @@ function abort() {
 	local MSG=$1
 	local EC=$2
 
+    printf "\e[31m"
 	printf "\n\a[BUILD ABORTED: $1]\n\n"
-	
+    printf "\e[39m"
+
 	# if exit code passed => exit
 	[[ ${EC} != "" ]] && exit ${EC}
 }
@@ -86,7 +88,9 @@ function run() {
 	# check if target name given and valid
 	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
+	printf "\e[96m"
 	printf "\n[$TARGET]\n"
+	printf "\e[39m"
 
 	${FUNCTION_NAME} | sed "s/^/    /"
 	local RESULT=$?
@@ -127,7 +131,10 @@ function init() {
 
     # execute init project specific routine
     if [ `type -t ${INIT_FUNCTION}`"" == 'function' ]; then
+        printf "\e[96m"
         printf "[${INIT_FUNCTION}]\n"
+	    printf "\e[39m"
+
         # run init routine from target definition
         ${INIT_FUNCTION} | sed "s/^/    /"
         local RESULT=$?
@@ -147,10 +154,14 @@ function build() {
 
 }
 
+printf "\e[97m"
+
 # print app info
 printf "\n$TITLE $VERSION\n"
 printf "$VENDOR\n"
 printf "All rights MIT licensed.\n\n"
+
+printf "\e[39m"
 
 # capture current time for build measurement
 START_TIME=$(date +%s)
