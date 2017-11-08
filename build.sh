@@ -14,13 +14,15 @@
 #
 # global parameter
 #
+SCRIPT_FILE=$0
 PARAM=$1
+BASEDIR="."
 
 TITLE="Simple Build for Rack"
 VERSION="0.0.1"
 VENDOR="http://github.com/lindenbergresearch"
 
-TARGETS_CONFIG="./targets.build"
+TARGETS_CONFIG="targets.build"
 TARGET_PREFIX="target_"
 
 
@@ -61,6 +63,15 @@ function abort() {
 
 
 #
+# test file for symbolic link
+#
+function islinked() {
+    readlink $1 > /dev/null
+    return $?
+}
+
+
+#
 # run target and check for error
 #
 function run() {
@@ -86,11 +97,24 @@ function run() {
 #
 function init() {
 
+    # check for base directory of current script
+    # this is a bit tricky... don't forget symbolic links!
+    if islinked ${SCRIPT_FILE};
+    then
+        local TMP=$(readlink ${SCRIPT_FILE})
+        BASEDIR=$(dirname ${TMP})
+    else
+        BASEDIR=$(dirname ${SCRIPT_FILE})
+    fi
+
+    # pull qualified path to target definition
+    local INCLUDE_FILE=${BASEDIR}/${TARGETS_CONFIG}
+
 	# check if target definition exists
-	[[ -f ${TARGETS_CONFIG} ]] || abort "Target definition file not found: '$TARGETS_CONFIG'"
+	[[ -f ${INCLUDE_FILE} ]] || abort "Target definition file not found: '$INCLUDE_FILE'"
 
 	# load target definitions into current shell
-	. ${TARGETS_CONFIG}
+	. ${INCLUDE_FILE}
 
 	# check for default target
 	target_exists ${DEFAULT_TARGET} || abort "Default target does not exist: '${DEFAULT_TARGET}'" 3
