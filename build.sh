@@ -28,6 +28,7 @@ INIT_FUNCTION="startup"
 
 RACK_DIR=""
 DEFAULT_TARGET=""
+CURRENT_TARGET=""
 
 # init usage help text array
 declare -a USAGE_TEXT=("")
@@ -94,6 +95,8 @@ function islinked() {
 #
 function run() {
 	local TARGET=$1
+	CURRENT_TARGET=${TARGET}
+
 	# add prefix to target name to get function binding
 	local FUNCTION_NAME=${TARGET_PREFIX}${TARGET}
 
@@ -101,10 +104,10 @@ function run() {
 	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
 	printf "\e[96m"
-	printf "\n[$TARGET]\n"
+	printf "\n$TARGET: \n"
 	printf "\e[39m"
 
-	${FUNCTION_NAME} | sed "s/^/ > /"
+	${FUNCTION_NAME} | sed "s/^/  /"
 	local RESULT=$?
 
 	# check success of executed target
@@ -123,7 +126,7 @@ function depends() {
       	target_exists ${I} || abort "Unable to resolve dependency: '${I}'" 3
 
         printf "\e[96m"
-	    printf "\n[resolving dependency $I]\n"
+	    printf "\n[$CURRENT_TARGET => $I]\n"
 	    printf "\e[39m"
 
 	    run ${I}
