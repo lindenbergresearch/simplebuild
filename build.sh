@@ -24,6 +24,7 @@ VENDOR="http://github.com/lindenbergresearch"
 
 TARGETS_CONFIG="targets.build"
 TARGET_PREFIX="target_"
+INIT_FUNCTION="startup"
 
 RACK_DIR=""
 DEFAULT_TARGET=""
@@ -85,7 +86,7 @@ function run() {
 	# check if target name given and valid
 	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
-	printf "[$TARGET]\n"
+	printf "\n[$TARGET]\n"
 
 	${FUNCTION_NAME} | sed "s/^/    /"
 	local RESULT=$?
@@ -102,8 +103,7 @@ function init() {
 
     # check for base directory of current script
     # this is a bit tricky... don't forget symbolic links!
-    if islinked ${SCRIPT_FILE};
-    then
+    if islinked ${SCRIPT_FILE}; then
         local TMP=$(readlink ${SCRIPT_FILE})
         BASEDIR=$(dirname ${TMP})
     else
@@ -124,6 +124,17 @@ function init() {
 	
 	# check for Rack dir
 	[[ -d ${RACK_DIR} ]] || abort "Rack base directory does not exist: '$RACK_DIR'" 4
+
+    # execute init project specific routine
+    if [ `type -t ${INIT_FUNCTION}`"" == 'function' ]; then
+        printf "[${INIT_FUNCTION}]\n"
+        # run init routine from target definition
+        ${INIT_FUNCTION} | sed "s/^/    /"
+        local RESULT=$?
+
+        # check success of init routine
+        [[ ${RESULT} != 0 ]] && abort "Init routine aborted with exit-code: $RESULT"
+    fi
 }
 
 #

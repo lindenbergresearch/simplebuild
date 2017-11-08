@@ -15,14 +15,14 @@
 # global variables
 #
 DEFAULT_TARGET="plugin"
-MAKE_CMD="make"
+MAKE_CMD=$(which make)
 RACK_DIR="../.."
 
 #
 # build target for `plugin'
 #
 function target_plugin() {
-	$MAKE_CMD clean
+	${MAKE_CMD} clean
 	$MAKE_CMD
 }
 
@@ -31,8 +31,8 @@ function target_plugin() {
 #
 function target_all() {
 	pushd $RACK_DIR
-		$MAKE_CMD clean
-		$MAKE_CMD
+		${MAKE_CMD} clean
+		${MAKE_CMD}
 	popd
 
 	__plugin
@@ -45,6 +45,22 @@ function target_all() {
 function target_run() {
 	__plugin
 
-	push $RACK_DIR
+	push ${RACK_DIR}
 	make run
+}
+
+
+#
+# init function
+#
+# Always called BEFORE targets are executed.
+# Do some global checks und var init here.
+#
+function startup() {
+    printf "searching for make: '$MAKE_CMD' "
+
+    # check for make command
+	[ `type -t ${MAKE_CMD}`"" == 'file' ] || abort "Make command not found: '${MAKE_CMD}'" 5
+
+    printf "OK\n"
 }
