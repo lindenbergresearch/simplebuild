@@ -29,6 +29,8 @@ INIT_FUNCTION="startup"
 RACK_DIR=""
 DEFAULT_TARGET=""
 
+# init usage help text array
+declare -a USAGE_TEXT=("")
 
 #
 # check if given target exists
@@ -45,10 +47,15 @@ target_exists() {
 #
 function print_usage() {
 	printf "Usage Info: build [target]\n\n"
-	printf "	all		build Rack and plugin\n"
-	printf "	plugin	build plugin only\n"
-	printf "	run		build plugin and run rack\n\n"
-	printf "	-		build default target: $DEFAULT_TARGET\n"
+
+	for i in "${USAGE_TEXT[@]}"; do
+	    printf " -  $i\n"
+	done
+
+	#printf "	all		build Rack and plugin\n"
+	#printf "	plugin	build plugin only\n"
+	#printf "	run		build plugin and run rack\n\n"
+	#printf "	-		build default target: $DEFAULT_TARGET\n"
 }
 
 
@@ -162,6 +169,11 @@ printf "$VENDOR\n"
 printf "All rights MIT licensed.\n\n"
 
 printf "\e[39m"
+
+if [[ ${PARAM} == '-h' || ${PARAM} == '--help' ]]; then
+    print_usage
+    exit 0
+fi
 
 # capture current time for build measurement
 START_TIME=$(date +%s)
