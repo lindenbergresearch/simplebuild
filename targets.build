@@ -19,20 +19,34 @@ MAKE_CMD=$(which make)
 RACK_DIR="../.."
 
 #
+# target clean
+#
+target_clean() {
+    ${MAKE_CMD} clean
+}
+
+
+#
 # build target for `plugin'
 #
-function target_plugin() {
-	${MAKE_CMD} clean
-	$MAKE_CMD
+add_usage "plugin" "build plugin"
+depends 'clean'
+
+target_plugin() {
+	${MAKE_CMD}
 }
+
 
 #
 # build target for `all'
 #
-function target_all() {
-	pushd $RACK_DIR
+#
+add_usage "all" "build Rack and plugin"
+
+target_all() {
+	pushd ${RACK_DIR} > /dev/null
 		${MAKE_CMD} clean
-		${MAKE_CMD}
+		${MAKE_CMD} > /dev/null
 	popd
 
 	__plugin
@@ -42,7 +56,9 @@ function target_all() {
 #
 # build target for `run'
 #
-function target_run() {
+add_usage "run" "build plugin and run Rack"
+
+target_run() {
 	__plugin
 
 	push ${RACK_DIR}

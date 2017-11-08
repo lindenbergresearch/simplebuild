@@ -48,14 +48,11 @@ target_exists() {
 function print_usage() {
 	printf "usage: build [target]\n"
 
+    printf "'-'h|'--'help : print this screen\n"
+
 	for i in "${USAGE_TEXT[@]}"; do
 	    printf "$i\n"
 	done
-
-	#printf "	all		build Rack and plugin\n"
-	#printf "	plugin	build plugin only\n"
-	#printf "	run		build plugin and run rack\n\n"
-	#printf "	-		build default target: $DEFAULT_TARGET\n"
 }
 
 
@@ -107,11 +104,32 @@ function run() {
 	printf "\n[$TARGET]\n"
 	printf "\e[39m"
 
-	${FUNCTION_NAME} | sed "s/^/    /"
+	${FUNCTION_NAME} | sed "s/^/ > /"
 	local RESULT=$?
 
 	# check success of executed target
 	[[ ${RESULT} != 0 ]] && abort "Target: '$TARGET' aborted with exit-code: $RESULT"
+}
+
+
+#
+# resolve dependencies of an target
+#
+function depends() {
+    local TARGETS=$(echo $1 | sed "s/,/ /g")
+
+    # loop through comma separated targets
+    for I in $(echo ${TARGETS}) ; do
+      	target_exists ${I} || abort "Unable to resolve dependency: '${I}'" 3
+
+        printf "\e[96m"
+	    printf "\n[resolving dependency $I]\n"
+	    printf "\e[39m"
+
+	    run ${I}
+    done
+
+    exit 1
 }
 
 #
@@ -155,7 +173,7 @@ function init() {
 	    printf "\e[39m"
 
         # run init routine from target definition
-        ${INIT_FUNCTION} | sed "s/^/    /"
+        ${INIT_FUNCTION} | sed "s/^/ - /"
         local RESULT=$?
 
         # check success of init routine
