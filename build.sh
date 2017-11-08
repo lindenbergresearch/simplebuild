@@ -25,14 +25,17 @@ VENDOR="http://github.com/lindenbergresearch"
 TARGETS_CONFIG="targets.build"
 TARGET_PREFIX="target_"
 
+RACK_DIR=""
+DEFAULT_TARGET=""
+
 
 #
 # check if given target exists
 #
 target_exists() {
   # use prefixed underscores to define a target as bash function
-  local TARGETF=${TARGET_PREFIX}${1}
-  [ `type -t ${TARGETF}`"" == 'function' ]
+  local TARGET_FUNCTION=${TARGET_PREFIX}${1}
+  [ `type -t ${TARGET_FUNCTION}`"" == 'function' ]
 }
 
 
@@ -77,14 +80,14 @@ function islinked() {
 function run() {
 	local TARGET=$1
 	# add prefix to target name to get function binding
-	local FNAME=${TARGET_PREFIX}${TARGET}
+	local FUNCTION_NAME=${TARGET_PREFIX}${TARGET}
 
 	# check if target name given and valid
 	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
 	printf "[$TARGET]\n"
 
-	${FNAME} | sed "s/^/    /"
+	${FUNCTION_NAME} | sed "s/^/    /"
 	local RESULT=$?
 
 	# check success of executed target
@@ -121,9 +124,6 @@ function init() {
 	
 	# check for Rack dir
 	[[ -d ${RACK_DIR} ]] || abort "Rack base directory does not exist: '$RACK_DIR'" 4
-
-	# check for make command
-	[ `type -t ${MAKE_CMD}`"" == 'file' ] || abort "Make command not found: '${MAKE_CMD}'" 5
 }
 
 #
