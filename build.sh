@@ -46,16 +46,24 @@ target_exists() {
 # print usage text
 #
 function print_usage() {
-	printf "Usage Info: build [target]\n\n"
+	printf "usage: build [target]\n"
 
 	for i in "${USAGE_TEXT[@]}"; do
-	    printf " -  $i\n"
+	    printf "$i\n"
 	done
 
 	#printf "	all		build Rack and plugin\n"
 	#printf "	plugin	build plugin only\n"
 	#printf "	run		build plugin and run rack\n\n"
 	#printf "	-		build default target: $DEFAULT_TARGET\n"
+}
+
+
+#
+# add line to usage text
+#
+function add_usage() {
+    USAGE_TEXT[${#USAGE_TEXT[*]}]="$1 : $2"
 }
 
 
@@ -106,12 +114,10 @@ function run() {
 	[[ ${RESULT} != 0 ]] && abort "Target: '$TARGET' aborted with exit-code: $RESULT"
 }
 
-
 #
-# init build process
+# load target definitions
 #
-function init() {
-
+function load_defs() {
     # check for base directory of current script
     # this is a bit tricky... don't forget symbolic links!
     if islinked ${SCRIPT_FILE}; then
@@ -129,7 +135,13 @@ function init() {
 
 	# load target definitions into current shell
 	. ${INCLUDE_FILE}
+}
 
+
+#
+# init build process
+#
+function init() {
 	# check for default target
 	target_exists ${DEFAULT_TARGET} || abort "Default target does not exist: '${DEFAULT_TARGET}'" 3
 	
@@ -170,8 +182,12 @@ printf "All rights MIT licensed.\n\n"
 
 printf "\e[39m"
 
+load_defs
+
 if [[ ${PARAM} == '-h' || ${PARAM} == '--help' ]]; then
     print_usage
+
+    printf "\n"
     exit 0
 fi
 
