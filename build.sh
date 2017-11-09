@@ -103,7 +103,7 @@ function run() {
 	# check if target name given and valid
 	[[ ${TARGET} == "" ]] && abort "run can not execute an empty target" 6
 
-	printf "\e[96m"
+	printf "\e[0;33m"
 	printf "\n$TARGET: \n"
 	printf "\e[39m"
 
@@ -125,14 +125,12 @@ function depends() {
     for I in $(echo ${TARGETS}) ; do
       	target_exists ${I} || abort "Unable to resolve dependency: '${I}'" 3
 
-        printf "\e[96m"
-	    printf "\n[$CURRENT_TARGET => $I]\n"
+        printf "\e[1;30m"
+	    printf "\nresolving dependency: $CURRENT_TARGET <= $I"
 	    printf "\e[39m"
 
 	    run ${I}
     done
-
-    exit 1
 }
 
 #
@@ -171,12 +169,12 @@ function init() {
 
     # execute init project specific routine
     if [ `type -t ${INIT_FUNCTION}`"" == 'function' ]; then
-        printf "\e[96m"
-        printf "[${INIT_FUNCTION}]\n"
+        printf "\e[0;33m"
+        printf "${INIT_FUNCTION}:\n"
 	    printf "\e[39m"
 
         # run init routine from target definition
-        ${INIT_FUNCTION} | sed "s/^/ - /"
+        ${INIT_FUNCTION} | sed "s/^/  /"
         local RESULT=$?
 
         # check success of init routine
@@ -189,17 +187,19 @@ function init() {
 #
 function build() {
 	# empty parameter => run default target
-	[[ ${PARAM} == "" ]] && run ${DEFAULT_TARGET} ; return
-
-
+	if [[ ${PARAM} == "" ]]; then
+	    run ${DEFAULT_TARGET}
+    else
+        run ${PARAM}
+    fi
 }
 
 printf "\e[97m"
 
 # print app info
 printf "\n$TITLE $VERSION\n"
-printf "$VENDOR\n"
-printf "All rights MIT licensed.\n\n"
+printf "All rights MIT licensed.\n"
+printf "$VENDOR\n\n"
 
 printf "\e[39m"
 
@@ -221,4 +221,6 @@ build
 END_TIME=$(date +%s)
 TOTAL_TIME=$(($END_TIME - $START_TIME))"s"
 
+printf "\e[0;32m"
 printf "\n[BUILD FINISHED in $TOTAL_TIME]\n\n"
+printf "\e[39m"
