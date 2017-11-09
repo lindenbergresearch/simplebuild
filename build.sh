@@ -140,7 +140,7 @@ function depends() {
 #
 function load_defs() {
     # check for base directory of current script
-    # this is a bit tricky... don't forget symbolic links!
+    # this is a bit tricky... don't forget symbolic links
     if islinked ${SCRIPT_FILE}; then
         local TMP=$(readlink ${SCRIPT_FILE})
         BASEDIR=$(dirname ${TMP})
