@@ -30,9 +30,10 @@ target_clean() {
 # build target for `plugin'
 #
 add_usage "plugin" "build plugin"
-depends 'clean'
 
 target_plugin() {
+	depends 'clean'
+
 	${MAKE_CMD}
 }
 
@@ -44,12 +45,12 @@ target_plugin() {
 add_usage "all" "build Rack and plugin"
 
 target_all() {
-	pushd ${RACK_DIR} > /dev/null
-		${MAKE_CMD} clean
-		${MAKE_CMD} > /dev/null
-	popd
+    depends 'plugin'
 
-	__plugin
+	pushd ${RACK_DIR}
+		${MAKE_CMD} clean
+		${MAKE_CMD}
+	popd
 }
 
 
@@ -59,7 +60,7 @@ target_all() {
 add_usage "run" "build plugin and run Rack"
 
 target_run() {
-	__plugin
+	depends 'plugin'
 
 	push ${RACK_DIR}
 	make run
