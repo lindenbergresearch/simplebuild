@@ -62,8 +62,9 @@ add_usage "run" "build plugin and run Rack"
 target_run() {
 	depends 'plugin'
 
-	push ${RACK_DIR}
+	pushd ${RACK_DIR}
 	make run
+    popd
 }
 
 
